@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Loader2, MicIcon, TrashIcon } from 'lucide-react';
@@ -13,7 +12,8 @@ import {
   SupportedLanguage, 
   detectLanguage, 
   getResponse,
-  getGreeting
+  getGreeting,
+  languageNames
 } from '@/utils/languageUtils';
 
 type Message = {
@@ -35,7 +35,6 @@ const ChatInterface: React.FC = () => {
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
-  // Initialize chat with greeting
   useEffect(() => {
     const welcomeMessage: Message = {
       id: Date.now().toString(),
@@ -49,25 +48,21 @@ const ChatInterface: React.FC = () => {
     setMessages([welcomeMessage]);
   }, []);
   
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (endOfMessagesRef.current) {
       endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
-
-  // Focus input on mount
+  
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
   
-  // Handle language change
   const handleLanguageChange = (language: SupportedLanguage) => {
     setSelectedLanguage(language);
     
-    // Add a system message about language change
     const systemMessage: Message = {
       id: Date.now().toString(),
       text: getGreeting(language),
@@ -80,21 +75,17 @@ const ChatInterface: React.FC = () => {
     setMessages(prev => [...prev, systemMessage]);
   };
   
-  // Handle sending a message
   const handleSendMessage = async () => {
     if (!input.trim()) return;
     
-    // Detect language if auto-detection is enabled
     const detectedLanguage = autoDetectLanguage
       ? detectLanguage(input)
       : selectedLanguage;
     
-    // If language changes, update the selected language
     if (autoDetectLanguage && detectedLanguage !== selectedLanguage) {
       setSelectedLanguage(detectedLanguage);
     }
     
-    // Create user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: input,
@@ -103,22 +94,16 @@ const ChatInterface: React.FC = () => {
       timestamp: new Date()
     };
     
-    // Add user message to chat
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    // Detect emotion from user input
     const emotion = detectEmotion(input, detectedLanguage);
     
-    // Simulate typing
     setIsTyping(true);
     
-    // Simulate bot response with a delay
     setTimeout(() => {
-      // Generate response based on emotion and language
       const botResponse = getResponse(emotion, detectedLanguage);
       
-      // Create bot message
       const botMessage: Message = {
         id: Date.now().toString(),
         text: botResponse,
@@ -128,22 +113,18 @@ const ChatInterface: React.FC = () => {
         timestamp: new Date()
       };
       
-      // Add bot message to chat
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 500); // Random delay between 1-1.5s
+    }, 1000 + Math.random() * 500);
   };
   
-  // Handle enter key press
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
   };
   
-  // Clear chat history
   const handleClearChat = () => {
-    // Reset to just the welcome message
     const welcomeMessage: Message = {
       id: Date.now().toString(),
       text: getGreeting(selectedLanguage),
@@ -158,7 +139,6 @@ const ChatInterface: React.FC = () => {
   
   return (
     <div className="w-full max-w-2xl mx-auto h-[600px] flex flex-col rounded-xl overflow-hidden glass">
-      {/* Header */}
       <motion.div 
         className="p-4 border-b flex justify-between items-center"
         initial={{ opacity: 0, y: -10 }}
@@ -181,7 +161,6 @@ const ChatInterface: React.FC = () => {
         </Button>
       </motion.div>
       
-      {/* Messages area */}
       <ScrollArea className="flex-1 p-4">
         <AnimatePresence>
           {messages.map((message) => (
@@ -195,7 +174,6 @@ const ChatInterface: React.FC = () => {
             />
           ))}
           
-          {/* Typing indicator */}
           {isTyping && (
             <motion.div
               className="flex justify-start mb-4"
@@ -214,11 +192,9 @@ const ChatInterface: React.FC = () => {
           )}
         </AnimatePresence>
         
-        {/* Empty div for auto-scrolling */}
         <div ref={endOfMessagesRef} />
       </ScrollArea>
       
-      {/* Input area */}
       <motion.div 
         className="p-4 border-t flex flex-col gap-4"
         initial={{ opacity: 0, y: 10 }}
