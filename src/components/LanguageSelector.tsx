@@ -26,9 +26,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) 
   const [open, setOpen] = React.useState(false);
 
   const languages = [
-    { value: 'en', label: languageNames.en },
-    { value: 'es', label: languageNames.es },
-    { value: 'ja', label: languageNames.ja }
+    { value: 'en' as SupportedLanguage, label: languageNames.en },
+    { value: 'es' as SupportedLanguage, label: languageNames.es },
+    { value: 'ja' as SupportedLanguage, label: languageNames.ja }
   ];
   
   return (
