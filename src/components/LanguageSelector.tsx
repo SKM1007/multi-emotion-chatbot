@@ -25,20 +25,11 @@ interface LanguageSelectorProps {
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) => {
   const [open, setOpen] = React.useState(false);
 
-  const languages: { value: SupportedLanguage; label: string }[] = [
+  const languages = [
     { value: 'en', label: languageNames.en },
     { value: 'es', label: languageNames.es },
     { value: 'ja', label: languageNames.ja }
   ];
-  
-  // Helper function to handle command selection
-  const handleSelect = (selectedValue: string) => {
-    const language = languages.find(lang => lang.label === selectedValue);
-    if (language) {
-      onChange(language.value);
-      setOpen(false);
-    }
-  };
   
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -64,8 +55,10 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) 
             {languages.map((language) => (
               <CommandItem
                 key={language.value}
-                value={language.label}
-                onSelect={() => handleSelect(language.label)}
+                onSelect={() => {
+                  onChange(language.value);
+                  setOpen(false);
+                }}
                 className="cursor-pointer"
               >
                 <Check
