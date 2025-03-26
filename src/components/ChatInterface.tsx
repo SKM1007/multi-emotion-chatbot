@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Loader2, MicIcon, TrashIcon } from 'lucide-react';
@@ -31,6 +32,7 @@ const ChatInterface: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('en');
   const [autoDetectLanguage, setAutoDetectLanguage] = useState(true);
+  const [lastEmotion, setLastEmotion] = useState<Emotion>('neutral');
   
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -86,10 +88,14 @@ const ChatInterface: React.FC = () => {
       setSelectedLanguage(detectedLanguage);
     }
     
+    const emotion = detectEmotion(input, detectedLanguage);
+    setLastEmotion(emotion);
+    
     const userMessage: Message = {
       id: Date.now().toString(),
       text: input,
       isUser: true,
+      emotion: emotion,
       language: detectedLanguage,
       timestamp: new Date()
     };
@@ -97,9 +103,10 @@ const ChatInterface: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    const emotion = detectEmotion(input, detectedLanguage);
-    
     setIsTyping(true);
+    
+    // Simulate varying response times to make it more natural
+    const responseTime = 800 + Math.random() * 1200;
     
     setTimeout(() => {
       const botResponse = getResponse(emotion, detectedLanguage);
@@ -108,14 +115,14 @@ const ChatInterface: React.FC = () => {
         id: Date.now().toString(),
         text: botResponse,
         isUser: false,
-        emotion,
+        emotion: emotion,
         language: detectedLanguage,
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 500);
+    }, responseTime);
   };
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -135,6 +142,29 @@ const ChatInterface: React.FC = () => {
     };
     
     setMessages([welcomeMessage]);
+    setLastEmotion('neutral');
+  };
+  
+  // Function to get a contextual placeholder based on the last emotion
+  const getPlaceholder = (): string => {
+    const baseText = autoDetectLanguage 
+      ? 'Type a message in any language...' 
+      : `Type in ${languageNames[selectedLanguage]}...`;
+      
+    if (messages.length <= 1) return baseText;
+    
+    switch (lastEmotion) {
+      case 'happy':
+        return `Continue the happy conversation...`;
+      case 'sad':
+        return `Share what's making you feel down...`;
+      case 'angry':
+        return `Tell me more about what's bothering you...`;
+      case 'surprised':
+        return `Tell me more about this surprise...`;
+      default:
+        return baseText;
+    }
   };
   
   return (
@@ -148,7 +178,7 @@ const ChatInterface: React.FC = () => {
         <div className="flex flex-col">
           <h2 className="font-medium">Emotion-Aware Multilingual Chatbot</h2>
           <p className="text-sm text-muted-foreground">
-            Chat in English, Spanish, or Japanese
+            Chat in English, Spanish, Japanese, or French
           </p>
         </div>
         <Button 
@@ -231,12 +261,13 @@ const ChatInterface: React.FC = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={`Message in ${autoDetectLanguage ? 'any language' : languageNames[selectedLanguage]}...`}
+            placeholder={getPlaceholder()}
             className="flex-1"
           />
           <Button 
             onClick={handleSendMessage}
             disabled={!input.trim() || isTyping}
+            className="transition-all duration-300"
           >
             {isTyping ? (
               <Loader2 className="h-4 w-4 animate-spin" />

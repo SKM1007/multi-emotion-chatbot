@@ -26,7 +26,7 @@ const Index = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          Chat naturally in English, Spanish, or Japanese. The AI will detect your emotions
+          Chat naturally in English, Spanish, Japanese, or French. The AI will detect your emotions
           and respond accordingly in the same language.
         </motion.p>
       </motion.div>
@@ -48,6 +48,7 @@ const Index = () => {
       >
         <p>Try typing in different languages and expressing different emotions.</p>
         <p>The chatbot will respond in the same language and adapt to your emotional state.</p>
+        <p className="mt-2">Examples: "I'm feeling happy today", "Je suis triste", "Estoy enfadado", "私は驚いた"</p>
       </motion.div>
     </div>
   );

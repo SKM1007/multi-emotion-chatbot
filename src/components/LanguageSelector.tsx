@@ -28,7 +28,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) 
   const languages = [
     { value: 'en' as SupportedLanguage, label: languageNames.en },
     { value: 'es' as SupportedLanguage, label: languageNames.es },
-    { value: 'ja' as SupportedLanguage, label: languageNames.ja }
+    { value: 'ja' as SupportedLanguage, label: languageNames.ja },
+    { value: 'fr' as SupportedLanguage, label: languageNames.fr }
   ];
   
   return (
@@ -55,8 +56,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ value, onChange }) 
             {languages.map((language) => (
               <CommandItem
                 key={language.value}
-                onSelect={() => {
-                  onChange(language.value);
+                value={language.value}
+                onSelect={(currentValue) => {
+                  onChange(currentValue as SupportedLanguage);
                   setOpen(false);
                 }}
                 className="cursor-pointer"
